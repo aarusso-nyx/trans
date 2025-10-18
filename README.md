@@ -27,8 +27,8 @@ Translate Angular `messages.xlf` files into one or more locales using OpenAI mod
 2. Install and run
 
 - Local: install deps `npm install`
-- Global (optional): `npm i -g .` then use `i18n-translator` directly
-- Single language: `node index.mjs messages.xlf -t fr` or `i18n-translator messages.xlf -t fr`
+- Global (optional): `npm i -g .` then use `trans` or `i18n-translator` directly
+- Single language: `node index.mjs messages.xlf -t fr` or `trans messages.xlf -t fr`
 - Multiple: `node index.mjs messages.xlf -t en,es,fr,de`
 - Packs: `node index.mjs messages.xlf -t west` (→ `pt,en,es,fr,de`), `-t east` (→ `jp,ko,zh,ar`), or `-t all`
 
@@ -60,6 +60,7 @@ Outputs are saved next to the source as `messages.<lang>.xlf` with `<file target
 - Nested JSON structure per source/target/model: entries[src][tgt][model][sha256(text)] = translation.
 - Migrates old flat cache keys `<src>|<tgt>|<model>|<hash>` on first run.
 - Cache file: `.i18n-cache.json` can be committed for reproducibility or ignored.
+- Global installs default to `~/.trans/cache.json`. Local runs still use `.i18n-cache.json` if present.
 
 ## Examples
 

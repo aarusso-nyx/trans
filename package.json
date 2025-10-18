@@ -4,8 +4,17 @@
   "description": "",
   "main": "index.mjs",
   "bin": {
-    "i18n-translator": "./index.mjs"
+    "i18n-translator": "./index.mjs",
+    "trans": "./bin/trans.js"
   },
+  "preferGlobal": true,
+  "files": [
+    "index.mjs",
+    "bin/",
+    "README.md",
+    "AGENTS.md",
+    "scripts/smoke-validate.mjs"
+  ],
   "scripts": {
     "translate": "node index.mjs messages.xlf",
     "smoke": "node scripts/smoke-validate.mjs",

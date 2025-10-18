@@ -20,6 +20,7 @@
     - Multi-lang: `npm run translate -- -t en,es,fr,de`.
     - Packs: `-t west` → `pt,en,es,fr,de`; `-t east` → `jp,ko,zh,ar`; `-t all` → `pt,en,es,fr,de,jp,ko,zh,ar`.
     - Context strategies: `--context none` (default), `--context lang`, or `--context run` (keeps last 5 Q/A pairs).
+  - Global usage: after `npm i -g .`, run `trans <path/to/messages.xlf> -t fr`.
   - Smoke check: `npm test` (or `npm run smoke`) validates `target-language` and presence of `<target>`.
   - Lint: `npm run lint` (auto-fix with `npm run lint:fix`).
   - Format: `npm run format` (Prettier write) or `npm run format:check`.

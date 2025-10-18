@@ -18,6 +18,7 @@
 
 import fs from "fs-extra";
 import path from "path";
+import os from "os";
 import { parseStringPromise, Builder } from "xml2js";
 import readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
@@ -80,12 +81,20 @@ const TARGET_SPEC = opts.target;
 const MODEL = opts.model;
 const BATCH_SIZE = parseInt(opts.batch, 10);
 // const CONCURRENCY = parseInt(opts.concurrency, 10);
-const CACHE_FILE = opts.cache;
+let CACHE_FILE = opts.cache;
 const CLOBBER = Boolean(opts.clobber);
 const VERBOSE = Boolean(opts.verbose); // default false, enable with --verbose
 const CONTEXT_STRATEGY = String(opts.context || "none").toLowerCase();
 const CLEAN_CACHE = Boolean(opts["cleanCache"]) || Boolean(opts["clean-cache"]);
 const SOURCE_LANG_CLI = opts.source ? String(opts.source).trim() : null;
+
+// Resolve default cache path: use local .i18n-cache.json if present; otherwise ~/.trans/cache.json
+const HOME_CACHE_DIR = path.join(os.homedir(), ".trans");
+if (CACHE_FILE === ".i18n-cache.json") {
+  if (!fs.existsSync(CACHE_FILE)) {
+    CACHE_FILE = path.join(HOME_CACHE_DIR, "cache.json");
+  }
+}
 
 // Output files live alongside the input
 const OUT_DIR = path.dirname(INPUT_FILE);
@@ -469,6 +478,7 @@ async function main() {
   }
 
   // Load or initialize cache (shared across all target langs)
+  await fs.ensureDir(path.dirname(CACHE_FILE));
   const loadedCache = (await fs.readJSON(CACHE_FILE).catch(() => ({}))) || {};
   const cache = migrateCache(loadedCache);
 
