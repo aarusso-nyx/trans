@@ -3,20 +3,23 @@
 ## Project Structure & Module Organization
 
 - `index.mjs` — CLI to translate Angular i18n XLF files via OpenAI.
-- `messages.xlf` — sample source file; `messages.en-US.translated.xlf` — example output.
+- `messages.xlf` — source file; `messages.<lang>.xlf` — generated output per locale.
 - `.i18n-cache.json` — SHA-256 keyed translation cache (safe to reuse across runs).
 - `package.json`, `package-lock.json` — Node project metadata; `node_modules/` — deps.
 
 ## Build, Test, and Development Commands
 
 - Install deps: `npm install` (or `npm ci` in CI).
-- Run CLI: `node index.mjs <path/to/messages.xlf> -t en -m gpt-4o -b 25 -c 3 [--clobber] [--no-verbose]`.
+- Run CLI: `node index.mjs <path/to/messages.xlf> -t en,es,fr,de -m gpt-4o -b 50 [--clobber] [--verbose] [--context none|lang|run]`.
   - Creates/updates `messages.<lang>.xlf` alongside the source file.
   - Tip: `chmod +x index.mjs` then `./index.mjs ...` works due to shebang.
 - Environment: set `OPENAI_API_KEY` before running, e.g. `export OPENAI_API_KEY=sk-…`.
 
 - NPM scripts:
   - Translate: `npm run translate -- -t fr` (outputs `messages.fr.xlf`).
+    - Multi-lang: `npm run translate -- -t en,es,fr,de`.
+    - Packs: `-t west` → `pt,en,es,fr,de`; `-t east` → `jp,ko,zh,ar`; `-t all` → `pt,en,es,fr,de,jp,ko,zh,ar`.
+    - Context strategies: `--context none` (default), `--context lang`, or `--context run` (keeps last 5 Q/A pairs).
   - Smoke check: `npm test` (or `npm run smoke`) validates `target-language` and presence of `<target>`.
   - Lint: `npm run lint` (auto-fix with `npm run lint:fix`).
   - Format: `npm run format` (Prettier write) or `npm run format:check`.
@@ -47,12 +50,13 @@
 
 - Never commit API keys. Provide `OPENAI_API_KEY` via env/secret store.
 - Tune `--batch` and `--concurrency` to manage rate limits and cost; cache reduces repeat spend.
+- Cache is language-aware (src→target, model). English cache won’t affect French.
 - `.i18n-cache.json` can be committed for reproducibility or ignored if ephemeral.
 
 ## Architecture Overview
 
 - Parse XLF → detect source lang (OpenAI) → batch-translate → update `<trans-unit>` targets → rebuild XML.
-- Cache key: `sha256(sourceText)`; concurrency via `p-limit`.
+- Cache key: `<src>|<tgt>|<model>|sha256(text)`; concurrency via `p-limit`.
 
 ## Agent-Specific Instructions
 
